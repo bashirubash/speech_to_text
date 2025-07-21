@@ -1,34 +1,25 @@
-import torch
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+import os
+import openai
 import gradio as gr
-import librosa
 
-# Use Hugging Face pretrained model (English)
-model_name = "facebook/wav2vec2-base-960h"
+# Load OpenAI API key from environment variable
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Load processor and model
-processor = Wav2Vec2Processor.from_pretrained(model_name)
-model = Wav2Vec2ForCTC.from_pretrained(model_name)
+def transcribe(audio_path):
+    try:
+        with open(audio_path, "rb") as audio_file:
+            transcript = openai.Audio.transcribe("whisper-1", audio_file)
+        return transcript["text"]
+    except Exception as e:
+        return f"Error: {str(e)}"
 
-# Define the transcribe function
-def transcribe(audio):
-    sr = 16000  # Model expects 16kHz input
-    audio, _ = librosa.load(audio, sr=sr)
-    input_values = processor(audio, return_tensors="pt", sampling_rate=sr).input_values
-    with torch.no_grad():
-        logits = model(input_values).logits
-    predicted_ids = torch.argmax(logits, dim=-1)
-    transcription = processor.decode(predicted_ids[0])
-    return transcription
-
-# Create Gradio Interface
-interface = gr.Interface(
+iface = gr.Interface(
     fn=transcribe,
-    inputs=gr.Audio(source="microphone", type="filepath", label="Record or Upload Audio"),
-    outputs=gr.Textbox(label="Transcribed Text"),
-    title="Real-Time Speech to Text",
-    description="This app converts speech to text using Facebook's Wav2Vec2 model. Powered by Hugging Face Transformers and Gradio."
+    inputs=gr.Audio(type="filepath", label="Upload or Record Audio"),
+    outputs=gr.Textbox(label="Transcription"),
+    title="Speech to Text using ChatGPT API (Whisper)",
+    description="Upload or record audio and get transcription using OpenAI Whisper API."
 )
 
-# Launch the app
-interface.launch()
+if __name__ == "__main__":
+    iface.launch(server_name="0.0.0.0", server_port=int(os.getenv("PORT", 8080)))
