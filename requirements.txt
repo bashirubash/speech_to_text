@@ -1,1 +1,6 @@
-# Placeholder for requirements.txt
+flask
+transformers
+torch
+librosa
+soundfile
+numpy<2.0
