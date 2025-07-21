@@ -1,28 +1,26 @@
-from faster_whisper import WhisperModel
 import gradio as gr
+from faster_whisper import WhisperModel
 import os
 
-# Load the tiny model in int8 for CPU-friendly usage
-model = WhisperModel("tiny", device="cpu", compute_type="int8")
+# Load Whisper tiny or base model depending on your accuracy/speed needs
+model_size = "tiny"  # or "base" for better accuracy (still Render compatible)
+model = WhisperModel(model_size, device="cuda" if torch.cuda.is_available() else "cpu", compute_type="int8")
 
 def transcribe(audio_path):
     if audio_path is None or not os.path.exists(audio_path):
         return "Please upload or record an audio file."
 
-    segments, info = model.transcribe(audio_path)
+    segments, info = model.transcribe(audio_path, beam_size=5)  # beam search for better accuracy
 
-    transcription = ""
-    for segment in segments:
-        transcription += segment.text.strip() + " "
-
+    transcription = " ".join(segment.text.strip() for segment in segments)
     return transcription.strip()
 
 iface = gr.Interface(
     fn=transcribe,
     inputs=gr.Audio(type="filepath", label="Record or Upload Audio"),
     outputs="text",
-    title="Tiny Whisper Speech-to-Text",
-    description="Transcribe audio using faster-whisper tiny model. Fully Render compatible."
+    title="AI-Powered Speech-to-Text Transcription",
+    description="Smart, fast, and accurate speech-to-text using Whisper Tiny or Base (Render compatible)."
 )
 
 if __name__ == "__main__":
