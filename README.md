@@ -1,14 +1,11 @@
-# Speech to Text Web App
+# Speech-to-Text with Wav2Vec2
+
+A simple speech-to-text demo using **Wav2Vec2** model on Hugging Face Spaces.
 
 ## Features:
-- Upload .wav or .mp3 file
-- Converts speech to text using Facebook Wav2Vec2 model
+- Real-time transcription
+- Upload audio or use microphone
+- Powered by Gradio + Transformers + Torch
 
-## Deployment:
-- Compatible with Render.com
-- Model auto-loads from Hugging Face
-
-## Run Locally:
-```bash
-pip install -r requirements.txt
-python app.py
+## Model:
+- facebook/wav2vec2-base-960h (English)
