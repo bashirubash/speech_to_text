@@ -1,2 +1,3 @@
+faster-whisper
 gradio
-openai>=1.0.0
+torch
