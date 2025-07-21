@@ -1,7 +1,7 @@
 from faster_whisper import WhisperModel
 import gradio as gr
+import os
 
-# Load Tiny Model (fits Render free tier memory)
 model = WhisperModel("tiny", device="cpu", compute_type="int8")
 
 def transcribe(audio):
@@ -24,4 +24,7 @@ iface = gr.Interface(
     description="Transcribe audio to text using faster-whisper tiny model (Render compatible)."
 )
 
-iface.launch(server_name="0.0.0.0", server_port=10000)
+# Use dynamic port from Render
+port = int(os.environ.get("PORT", 7860))
+
+iface.launch(server_name="0.0.0.0", server_port=port)
