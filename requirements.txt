@@ -1,6 +1,4 @@
-flask
-transformers
 torch
+transformers
+gradio
 librosa
-soundfile
-numpy<2.0
